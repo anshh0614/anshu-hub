@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Magic for Disha 🌸</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,sans-serif;}
+
+body{
+height:100vh;
+background: linear-gradient(135deg,#ffd6e0,#ff8fab);
+background-size:400% 400%;
+animation: gradientShift 15s ease infinite;
+display:flex;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+position:relative;
+}
+
+@keyframes gradientShift{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+.flower{
+position:fixed;
+top:-40px;
+font-size:22px;
+animation:fall 6s linear forwards;
+pointer-events:none;
+}
+
+@keyframes fall{
+0%{transform:translateY(-10vh) rotate(0deg);opacity:0;}
+20%{opacity:1;}
+100%{transform:translateY(110vh) rotate(360deg);opacity:0;}
+}
+
+.screen{
+display:none;
+opacity:0;
+transform:scale(.95);
+transition:.6s;
+background:#fff0f6;
+padding:25px;
+border-radius:20px;
+text-align:center;
+max-width:420px;
+width:90%;
+box-shadow:0 15px 40px rgba(0,0,0,.25);
+position:relative;
+z-index:2;
+}
+
+.screen.active{
+display:block;
+opacity:1;
+transform:scale(1);
+}
+
+.fullscreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#fff0f6;
+z-index:10;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+padding:40px;
+text-align:center;
+}
+
+.songText{
+font-size:1.2rem;
+line-height:2;
+max-width:600px;
+}
+
+button{
+padding:12px 26px;
+border:none;
+border-radius:30px;
+font-size:1rem;
+cursor:pointer;
+margin:8px;
+}
+
+button.primary{background:#ff2e93;color:white;}
+button.secondary{background:white;color:#ff2e93;border:2px solid #ff2e93;}
+
+video{
+width:320px;
+max-width:90%;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,.3);
+}
+
+.glow{
+color:#ff2e93;
+text-shadow:0 0 10px #ff69b4,0 0 20px #ff8fab;
+animation: glowPulse 2s infinite;
+}
+
+@keyframes glowPulse{
+0%{opacity:.7;}
+50%{opacity:1;}
+100%{opacity:.7;}
+}
+</style>
+</head>
+<body>
+
+<!-- BACKGROUND MUSIC -->
+<audio id="bgMusic" loop>
+<source src="music.mp3" type="audio/mp3">
+</audio>
+
+<!-- SCREEN 1 -->
+<div class="screen active" id="screen1">
+<h1>Will you be my Valentine 🌸?</h1>
+<p>Choose wisely 😊</p>
+<button id="yesBtn" class="primary">Yes 💕</button>
+<button class="secondary">No 🙈</button>
+</div>
+
+<!-- SCREEN 2 -->
+<div class="screen" id="screen2">
+<h3>Choose a Gift 🎁✨</h3>
+<button class="primary" onclick="openGift()">Gift 1 🌸</button>
+<button class="secondary" onclick="openGift()">Gift 2 🎀</button>
+</div>
+
+<!-- CRAZY -->
+<div class="screen" id="crazyGift">
+<h2>Crazy Gift 😏💖</h2>
+<video id="valVideo" width="100%" controls>
+  <source src="video.mp4" type="video/mp4">
+</video>
+<button class="primary" onclick="startQuiz()">Start Quiz 💌</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="quizScreen">
+<h2 id="questionText"></h2>
+<button class="primary" onclick="answerQuiz('you')">You 💙</button>
+<button class="secondary" onclick="answerQuiz('me')">Me 💕</button>
+<div id="lightEffect" style="font-size:30px;margin-top:10px;"></div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="result">
+<h2>Compatibility Result 💞</h2>
+<p>You love her <b>100%</b> 💖</p>
+<p>She loves you <b>94%</b> 😉</p>
+<button onclick="showLifetime()">Next 💘</button>
+</div>
+
+<!-- LIFETIME -->
+<div class="screen" id="lifetime">
+<h2 class="glow">I would choose you in every lifetime 💘</h2>
+<button onclick="finalResponse()">Final 💌</button>
+</div>
+
+<!-- FINAL -->
+<div class="screen" id="finalScreen">
+<h2>Forever Yours ❤️</h2>
+<p>Thank you for being mine 🌸</p>
+</div>
+
+<script>
+
+const bgMusic=document.getElementById("bgMusic");
+const video=document.getElementById("valVideo");
+
+/* Smooth Fade Functions */
+function fadeIn(audio){
+audio.volume=0;
+audio.play();
+let fade=setInterval(()=>{
+if(audio.volume<0.98){
+audio.volume+=0.02;
+}else{
+audio.volume=1;
+clearInterval(fade);
+}
+},100);
+}
+
+function fadeOut(audio){
+let fade=setInterval(()=>{
+if(audio.volume>0.02){
+audio.volume-=0.02;
+}else{
+audio.volume=0;
+audio.pause();
+clearInterval(fade);
+}
+},100);
+}
+
+/* Autoplay Fix */
+document.addEventListener("click",function init(){
+fadeIn(bgMusic);
+document.removeEventListener("click",init);
+});
+
+/* Video Events */
+video.addEventListener("play",()=>{
+fadeOut(bgMusic);
+});
+
+video.addEventListener("pause",()=>{
+fadeIn(bgMusic);
+});
+
+video.addEventListener("ended",()=>{
+fadeIn(bgMusic);
+});
+
+/* FLOWERS */
+setInterval(()=>{
+const f=document.createElement("div");
+f.className="flower";
+f.innerHTML=["🌸","🌷","🌼"][Math.floor(Math.random()*3)];
+f.style.left=Math.random()*100+"vw";
+document.body.appendChild(f);
+setTimeout(()=>f.remove(),6000);
+},300);
+
+function hideAll(){
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+}
+
+document.getElementById("yesBtn").onclick=()=>{
+hideAll();
+document.getElementById("screen2").classList.add("active");
+};
+
+const letterText=`Hey Disha 🌸
+
+From the moment you came into my life, everything started feeling brighter... 💖`;
+
+function openGift(){
+const div=document.createElement("div");
+div.className="fullscreen";
+div.innerHTML="<div class='songText' id='song'></div>";
+document.body.appendChild(div);
+
+let words=letterText.split(" ");
+let i=0;
+let interval=setInterval(()=>{
+document.getElementById("song").innerHTML+=words[i]+" ";
+i++;
+if(i>=words.length){
+clearInterval(interval);
+setTimeout(()=>{
+div.remove();
+hideAll();
+document.getElementById("crazyGift").classList.add("active");
+},2000);
+}
+},200);
+}
+
+const questions=[
+{text:"Who loves more? 💖",correct:"me"},
+{text:"Who gets jealous first? 😏",correct:"you"},
+{text:"Who thinks about the other all day? 🌸",correct:"me"},
+{text:"Who smiles more remembering memories? 😊",correct:"me"},
+{text:"Who is more romantic? 💘",correct:"you"}
+];
+
+let current=0;
+
+function startQuiz(){
+hideAll();
+document.getElementById("quizScreen").classList.add("active");
+loadQ();
+}
+
+function loadQ(){
+document.getElementById("questionText").innerText=questions[current].text;
+document.getElementById("lightEffect").innerHTML="";
+}
+
+function answerQuiz(choice){
+if(choice===questions[current].correct){
+document.getElementById("lightEffect").innerHTML="Right ✅";
+}else{
+document.getElementById("lightEffect").innerHTML="Wrong ❌";
+}
+
+setTimeout(()=>{
+current++;
+if(current<questions.length){
+loadQ();
+}else{
+hideAll();
+document.getElementById("result").classList.add("active");
+}
+},1500);
+}
+
+function showLifetime(){
+hideAll();
+document.getElementById("lifetime").classList.add("active");
+}
+
+function finalResponse(){
+hideAll();
+document.getElementById("finalScreen").classList.add("active");
+}
+
+</script>
+</body>
+</html>
